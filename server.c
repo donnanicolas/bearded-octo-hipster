@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include "lib/pthread_pool.h"
 #include "tramullator.h"
+#include "string.h"
 
 #include <stdio.h>
 
@@ -70,7 +71,6 @@ int main (int argc, char *argv[]) {
 
 		while(readed = read(piped[0], buffer, 1024)) {
 			printf("llego al pipe: %s\n", buffer);
-			//buffer[readed] = 0;
 			write(logd, buffer, readed);
 		}
 		return 0;
