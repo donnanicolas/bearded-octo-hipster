@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include "lib/pthread_pool.h"
 #include "tramullator.h"
 
@@ -11,7 +12,10 @@
 
 int main (int argc, char *argv[]) {
 	pthread_pool *tp = NULL;
-	int sd, csd;
+	int  piped[2]
+	  , sd
+	  , csd;
+
 	struct sockaddr_in dir = {};
 	
 	tp = pthread_pool_create(NULL);
@@ -43,7 +47,39 @@ int main (int argc, char *argv[]) {
 
 	printf("listening...\n");
 
+	if(pipe(piped) < 0) {
+		printf("NOp!!\n");
+		return 0;	
+	}
+	
+
+	if(fork() == 0) {
+		int readed = 0
+		  , logd;
+		char buffer[1024];
+
+		memset(buffer, '\0', 1024);
+
+		logd = open("log.out", O_CREAT | O_APPEND, 0644);
+		if(logd < 0) {
+			printf("Nop!!!\n");
+			return -1;
+		}
+
+		close(piped[1]);
+
+		while(readed = read(piped[0], buffer, 1024)) {
+			printf("llego al pipe: %s\n", buffer);
+			//buffer[readed] = 0;
+			write(logd, buffer, readed);
+		}
+		return 0;
+	}
+
+	close(piped[0]);
+
 	while ((csd = accept(sd, NULL, NULL)) > 0) {
+		write(piped[1], "Request Recieved\n", 17); 
 		add_new_task(&(tp->list), tramullo, (void *) &csd, 1);	
 	}
 

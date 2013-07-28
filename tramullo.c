@@ -11,14 +11,6 @@ void* tramullo (void* param){
 
 	printf("Request recieved\n");
 
-	/*
-	PyObject *object;
-	PyObject *m = PyImport_AddModule("__main__");
-	if (m == NULL) 
-        	return NULL; 
-	PyObject *d = PyModule_GetDict(m); 
-	*/
-
 	request = (char *) malloc(sizeof(char) * 1024);
 
 	if(request == NULL) {
