@@ -61,7 +61,7 @@ int main (int argc, char *argv[]) {
 
 		memset(buffer, '\0', 1024);
 
-		logd = open("log.out", O_CREAT | O_APPEND, 0644);
+		logd = open("log.out", O_RDWR | O_CREAT | O_APPEND, 0644);
 		if(logd < 0) {
 			printf("Nop!!!\n");
 			return -1;
