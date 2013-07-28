@@ -14,3 +14,6 @@ client: client.c
 
 clean: 
 	rm *.sh *.out
+
+install:
+	git clone git@github.com:donnanicolas/um-book.git lib
