@@ -13,4 +13,4 @@ client: client.c
 	./$@.sh 100 100
 
 clean: 
-	rm *.sh
+	rm *.sh *.out
