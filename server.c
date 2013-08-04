@@ -51,9 +51,9 @@ int main (int argc, char *argv[]) {
 	/* end log */
 
 
-	if (fork())
-		ipv=4;
-	else
+//	if (fork())
+//		ipv=4;
+//	else
 		ipv=6;
 	sd = opensocket(ipv);
 
@@ -71,8 +71,18 @@ int main (int argc, char *argv[]) {
 	listen (sd,10);
 	printf("listening...\n");
 
-	while ((csd = accept(sd, NULL, NULL)) > 0) {
-		write(piped[1], "Request Recieved\n", 17); 
+	struct sockaddr adr;
+	int lenn;
+	while ((csd = accept(sd, &adr, &lenn)) > 0) {
+
+	if (csd <1)
+	{
+		perror("accept");
+		return -1;
+	}
+
+		write(piped[1], adr.sa_data, 35);
+		write(csd, "alo\n", 4);
 		add_new_task(&(tp->list), tramullo, (void *) &csd, 1);	
 	}
 

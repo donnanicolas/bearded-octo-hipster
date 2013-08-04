@@ -1,52 +1,51 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <sys/socket.h>
 #include "tramullator.h"
 
 int opensocket (int ipv){
-int sd;
 
-if (ipv == 4)
-{
-	struct sockaddr_in dir = {};
-        sd = socket(AF_INET,SOCK_STREAM,0);
-        if (sd < 0){
-                perror ("socket");
-                return -1;
-        }
-
-        int opt=1;
-        setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof (opt));
-
-        dir.sin_family = AF_INET;
-        dir.sin_port = htons(atoi("3000"));
-        inet_pton(AF_INET, "0.0.0.0", &dir.sin_addr);
-        if (bind (sd, (struct sockaddr *)&dir ,sizeof dir) < 0){
-                perror ("bind");
-                return -1;
-        }
-	return sd;
-}
-else
-{
+	int sd, s;
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
 	struct sockaddr_in6 dir = {};
-	sd = socket(AF_INET6, SOCK_STREAM, 0);
-	if (sd < 0){
-		perror("socket");
-		return -1;
+
+	memset (&hints, 0, sizeof (struct addrinfo));
+	hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
+	hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
+	hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
+	hints.ai_protocol = 0;          /* Any protocol */
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
+
+
+	s = getaddrinfo(NULL, "3000", &hints, &result);
+	if (s != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+		exit(EXIT_FAILURE);
 	}
+
+
+
+	for (rp = result; rp != NULL; rp = rp->ai_next) {
+		sd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (sd == -1)
+			continue;
+		//rp->ai_addr.sin_port = htons(atoi("3000"));
+		if (bind(sd, rp->ai_addr, rp->ai_addrlen) == 0)
+			break;                  /* Success */
+
+		close(sd);
+	}
+	printf ("sd: %d\n", sd);
 
 	int opt=1;
 	setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof (opt));
 //	setsockopt(sd, IPPROTO_TCP, TCP_NODELAY , (char *) &opt, sizeof (opt));
-
-	dir.sin6_family = AF_INET6;
-	dir.sin6_port = htons(atoi("3001"));
-	inet_pton(AF_INET6, "::", &dir.sin6_addr);
-	if (bind(sd , (struct sockaddr *)&dir , sizeof dir) < 0 ){
-		perror ("bind");
-		return -1;
-	}
 	return sd;
-}
 }
