@@ -7,7 +7,7 @@ void* tramullo (void* param){
 	int readed = 0
 	  , i=0;
 	char buffer[1024]
-	   , md5[32]
+	   , md5[36]
 	   , aux[2]
 	   , *request = NULL;
 
@@ -51,7 +51,12 @@ void* tramullo (void* param){
 		}
 	}
 
-	write(socketfd, md5, 32);
+	md5[32] = ' ';
+	md5[33] = ' ';
+	md5[34] = '-';
+	md5[35] = '\n';
+
+	write(socketfd, md5, 36);
 
 	close (socketfd);
 
