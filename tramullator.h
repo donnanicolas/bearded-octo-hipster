@@ -8,7 +8,7 @@
         #include <arpa/inet.h>
 
 	void * tramullo (void* param);
-	int opensocket (int);
+	int opensocket ();
 
 
 

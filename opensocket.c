@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include "tramullator.h"
 
-int opensocket (int ipv){
+int opensocket () {
 
 	int sd, s;
 	struct addrinfo hints;
@@ -33,6 +33,9 @@ int opensocket (int ipv){
 
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
+		printf("%d\n", rp->ai_family);
+		printf("%d\n", AF_INET);
+
 		sd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 		if (sd == -1)
 			continue;
@@ -45,7 +48,7 @@ int opensocket (int ipv){
 	printf ("sd: %d\n", sd);
 
 	int opt=1;
-	setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof (opt));
+	//setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof (opt));
 //	setsockopt(sd, IPPROTO_TCP, TCP_NODELAY , (char *) &opt, sizeof (opt));
 	return sd;
 }

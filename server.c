@@ -15,7 +15,6 @@ int main (int argc, char *argv[]) {
 	pthread_pool *tp = NULL;
 	int  piped[2]
 	  , sd
-	  , ipv
 	  , csd;
 
 	/*   log   */
@@ -50,12 +49,7 @@ int main (int argc, char *argv[]) {
 	close(piped[0]);
 	/* end log */
 
-
-//	if (fork())
-//		ipv=4;
-//	else
-		ipv=6;
-	sd = opensocket(ipv);
+	sd = opensocket();
 
 	/* pthread_pool create */
 	tp = pthread_pool_create(NULL);
@@ -71,18 +65,14 @@ int main (int argc, char *argv[]) {
 	listen (sd,10);
 	printf("listening...\n");
 
-	struct sockaddr adr;
-	int lenn;
-	while ((csd = accept(sd, &adr, &lenn)) > 0) {
+	while ((csd = accept(sd, NULL, NULL)) > 0) {
 
-	if (csd <1)
-	{
-		perror("accept");
-		return -1;
-	}
+		if (csd <1)
+		{
+			perror("accept");
+			return -1;
+		}
 
-		write(piped[1], adr.sa_data, 35);
-		write(csd, "alo\n", 4);
 		add_new_task(&(tp->list), tramullo, (void *) &csd, 1);	
 	}
 
