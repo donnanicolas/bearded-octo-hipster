@@ -5,6 +5,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <time.h>
 #include "lib/pthread_pool.h"
 #include "tramullator.h"
 #include "string.h"
@@ -27,7 +28,10 @@ int main (int argc, char *argv[]) {
 	if(fork() == 0) {
 		int readed = 0
 		  , logd;
-		char buffer[1024];
+		char buffer[1024]
+		   , *datestring;
+
+		time_t date;
 
 		memset(buffer, '\0', 1024);
 
@@ -40,7 +44,10 @@ int main (int argc, char *argv[]) {
 		close(piped[1]);
 
 		while((readed = read(piped[0], buffer, 1024)) > 0) {
-			printf("llego al pipe: %s\n", buffer);
+			time(&date);
+			datestring = ctime((const time_t *)&date);
+			// -1 to avoit the \n at the end of datestring
+			write(logd, datestring, (strlen(datestring) - 1));
 			write(logd, buffer, readed);
 		}
 		return 0;
@@ -72,6 +79,8 @@ int main (int argc, char *argv[]) {
 			perror("accept");
 			return -1;
 		}
+		
+		write(piped[1], " Request Received\n", 19);
 
 		add_new_task(&(tp->list), tramullo, (void *) &csd, 1);	
 	}
